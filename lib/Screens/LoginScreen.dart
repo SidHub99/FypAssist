@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyp_assist/Services/AuthService.dart';
 import 'package:fyp_assist/Styles/applayout.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:lottie/lottie.dart';
-
 import '../Styles/Styles.dart';
-import '../Widgets/AnimatedContainer.dart';
 import '../Widgets/SecondryButton.dart';
+import 'SignUp.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -17,6 +16,17 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final emailController=TextEditingController();
+  final passController=TextEditingController();
+  AuthService authService=AuthService();
+
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final size=AppLayout.getSize(context);
@@ -52,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Column(
                     children: [
                       TextField(
+                        controller: emailController,
                         decoration: InputDecoration(
                           labelStyle: GoogleFonts.montserrat(fontSize: 16,fontWeight: FontWeight.w400),
                             contentPadding: EdgeInsets.all(20.0),
@@ -71,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Gap(15),
                       TextField(
+                        controller: passController,
                         keyboardType: TextInputType.visiblePassword,
                         obscureText: true,
                         decoration: InputDecoration(
@@ -103,47 +115,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 Gap(35),
-                Padding(
-                    padding: EdgeInsets.all(22),
-                  child: SecondryButton(title: 'Login',width: size.width,height: size.height*0.07,),
+                GestureDetector(
+                  onTap: (){
+                    signin();
+                  },
+                  child: Padding(
+                      padding: EdgeInsets.all(22),
+                    child: SecondryButton(title: 'Login',width: size.width,height: size.height*0.07,),
 
+                  ),
                 ),
                 Gap(35),
-                Row(
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(left: 22),
-                      child: Container(
-                        height: 2,
-                        width: size.width*0.284,
-                        color: Styles.surfaceColor,
-                      ),
-                    ),
-                    Gap(10),
-                    SizedBox(
-                        width: size.width*0.29,
-                      child: Text("Or continue with",style: GoogleFonts.montserrat(fontSize: 12,fontWeight: FontWeight.w300),),
-                      ),
-                    Padding(
-                      padding: EdgeInsets.only(right: 22),
-                      child: Container(
-                        height: 2,
-                        width: size.width*0.284,
-                        color: Styles.surfaceColor,
-                      ),
-                    ),
-                  ],
-                ),
-                Gap(35),
-                AnimatedContainerBox(width: size.width*0.2,height: size.height*0.09,assetName: 'assets/googlelogo.json',),
-                Gap(35),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Not a Member?",style: GoogleFonts.montserrat(fontSize: 14,fontWeight: FontWeight.w300),),
-                    Gap(5),
-                    Text("Register now",style: GoogleFonts.montserrat(fontSize: 14,fontWeight: FontWeight.w300,color: Styles.secondryColor),),
-                  ],
+
+                GestureDetector(
+                  onTap: (){
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder)=>SignUp()));
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Not a Member?",style: GoogleFonts.montserrat(fontSize: 14,fontWeight: FontWeight.w300),),
+                      Gap(5),
+                      Text("Register now",style: GoogleFonts.montserrat(fontSize: 14,fontWeight: FontWeight.w300,color: Styles.secondryColor),),
+                    ],
+                  ),
                 ),
 
 
@@ -156,5 +151,29 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
 
     );
+
   }
+
+  signin() async {
+    if(validateFields()) {
+       authService.signInUser(context: context, email: emailController.text, password: passController.text, );
+    }
+  }
+  void showMessage(String s) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(s)),
+    );
+  }
+  bool validateFields() {
+    if(emailController.text.isEmpty){
+      showMessage("Must Enter Email Address");
+      return false;
+    }else if(passController.text.isEmpty){
+      showMessage("Must Enter Password");
+      return false;
+    }
+    return true;
+  }
+
+
 }

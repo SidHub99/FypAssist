@@ -9,6 +9,7 @@ import 'package:lottie/lottie.dart';
 
 import '../Styles/Styles.dart';
 import '../Widgets/SecondryRoundButton.dart';
+import 'SignUp.dart';
 
 class IntroductionScreen extends StatefulWidget {
   const IntroductionScreen({Key? key}) : super(key: key);
@@ -21,6 +22,8 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
   Color checkedColor = Colors.white;
   Color unCheckedColor = Styles.surfaceColor;
   bool register=true;
+
+
   @override
   Widget build(BuildContext context) {
     final size = AppLayout.getSize(context);
@@ -34,7 +37,7 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
             Container(
               width: size.width,
               height: size.height * 0.3,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   image: DecorationImage(
                 image: AssetImage("assets/airlogo.png"),
               )),
@@ -121,9 +124,9 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                InkWell(
+                GestureDetector(
                   onTap: (){
-                    register?showGoogleUI():Navigator.push(context, MaterialPageRoute(builder: (builder)=>LoginScreen()));
+                    register?Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder)=>SignUp())):Navigator.push(context, MaterialPageRoute(builder: (builder)=>LoginScreen()));
 
                   },
                     child: SecondryRoundButton(iconData: Icons.navigate_next_outlined)
