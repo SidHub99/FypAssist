@@ -16,23 +16,23 @@ import '../Constants/Constants.dart';
 class AuthService{
   void signUpUser({required context,required String email,required String password,required String fullname,String? section})async{
     try{
-      User user=User('', fullname, password, section!, email, "", "");
-      http.Response res=await http.post(Uri.parse('$uri/api/signup'),body:jsonEncode({
-        'id':'',
-        'name':fullname,
-        'password':password,
-        'section':section,
-        'email':email,
-        'role':'',
-        'token':'',
-      }),headers: <String,String>{
-        'Content-Type':'application/json; charset=UTF-8',
-      },
-      );
+        User user=User('', fullname , password, section!, email, "", "");
+        http.Response res=await http.post(Uri.parse('$uri/api/signup'),body:jsonEncode({
+          'id':'',
+          'name':fullname,
+          'password':password,
+          'section':section,
+          'email':email,
+          'role':'',
+          'token':'',
+        }),headers: <String,String>{
+          'Content-Type':'application/json; charset=UTF-8',
+        },
+        );
 
-    httpErrorHandle(response: res, context: context, onSuccess: (){
-      showSnackBar(context, "Sign Up Success");
-    });
+      httpErrorHandle(response: res, context: context, onSuccess: (){
+        showSnackBar(context, "Sign Up Success");
+      });
     }catch(Exception){
       showSnackBar(context, Exception.toString());
     }
@@ -60,6 +60,52 @@ class AuthService{
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (builder)=>HomeScreen()), (route) => false);
 
       });
+    }catch(Exception){
+      showSnackBar(context, Exception.toString());
+    }
+  }
+
+  void getUserData({required context})async{
+    try{
+      SharedPreferences prefs= await SharedPreferences.getInstance();
+      String ?token =prefs.getString('auth-token');
+      if(token==null)
+        {
+          prefs.setString('auth-token', "");
+        }
+      var tokenres=await http.post(Uri.parse('$uri/TokenIsValid'),
+      headers: <String,String>{
+        'Content-Type':'application/json; charset=UTF-8',
+        'auth-token': token!
+      }
+      );
+      var response = jsonDecode(tokenres.body);
+      if(response==true)
+        {
+
+
+        }
+
+      // http.Response res=await http.post(Uri.parse('$uri/api/signin'),body:jsonEncode({
+      //   'id':'',
+      //   'name':'',
+      //   'password':password,
+      //   'section':'',
+      //   'email':email,
+      //   'role':'',
+      //   'token':'',
+      // }),headers: <String,String>{
+      //   'Content-Type':'application/json; charset=UTF-8',
+      // },
+      // );
+      // print("body:"+res.body.toString());
+
+      // httpErrorHandle(response: res, context: context, onSuccess: () async {
+      //   SharedPreferences sharedPreferences=await SharedPreferences.getInstance();
+      //   sharedPreferences.setString('auth-token', jsonDecode(res.body)['token']);
+      //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (builder)=>HomeScreen()), (route) => false);
+      //
+      // });
     }catch(Exception){
       showSnackBar(context, Exception.toString());
     }

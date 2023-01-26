@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyp_assist/Screens/HomeScreen.dart';
+import 'package:fyp_assist/Screens/LoginScreen.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../Styles/applayout.dart';
 import 'IntroductionScreen.dart';
 
@@ -42,6 +45,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 3)).then((value) => {
+      StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if(snapshot.hasData)
+            {
+              return HomeScreen();
+            }
+          else return LoginScreen();
+        }),
       Navigator.push(context, MaterialPageRoute(builder: (builder)=>IntroductionScreen())),
     });
   }

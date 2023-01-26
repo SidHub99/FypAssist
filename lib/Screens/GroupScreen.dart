@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyp_assist/Screens/InviteStudents.dart';
 import 'package:fyp_assist/Widgets/HomeButton.dart';
 import 'package:gap/gap.dart';
 
@@ -30,7 +31,12 @@ class _GroupScreenState extends State<GroupScreen> {
                     children: [
                       HomeButton(title: "Create new group", iconData: Icons.add),
                       Gap(15),
-                      HomeButton(title: "Send Invitation", iconData: CupertinoIcons.envelope),
+                      GestureDetector(
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>InviteStudents()));
+                          },
+                          child: HomeButton(title: "Send Invitation", iconData: CupertinoIcons.envelope,
+                      )),
                     ],
                   ),
                   Gap(20),

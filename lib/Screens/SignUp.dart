@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyp_assist/Classes/utils.dart';
+import 'package:fyp_assist/Constants/Util.dart';
 import 'package:fyp_assist/Services/AuthService.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:ndialog/ndialog.dart';
 import '../Styles/Styles.dart';
 import '../Styles/applayout.dart';
 import '../Widgets/AnimatedContainer.dart';
@@ -17,6 +21,8 @@ class SignUp extends StatefulWidget {
   State<SignUp> createState() => _SignUpState();
 }
 
+
+
 class _SignUpState extends State<SignUp> {
 
   AuthService authService=AuthService();
@@ -29,15 +35,16 @@ class _SignUpState extends State<SignUp> {
   final fullnameController=TextEditingController();
   final emailController=TextEditingController();
   final passController=TextEditingController();
-  final sectionController=TextEditingController();
-
+  final rollnoController=TextEditingController();
+  final deptController=TextEditingController();
 
   @override
   void dispose() {
     fullnameController.dispose();
     emailController.dispose();
     passController.dispose();
-    sectionController.dispose();
+    deptController.dispose();
+    rollnoController.dispose();
   }
 
   @override
@@ -129,15 +136,36 @@ class _SignUpState extends State<SignUp> {
                             ),
                           ),
                           Gap(15),
+                      TextField(
+                        controller: deptController,
+                        keyboardType: TextInputType.name,
+                        decoration: InputDecoration(
+                          labelStyle: GoogleFonts.montserrat(fontSize: 16,fontWeight: FontWeight.w400),
+                          contentPadding: EdgeInsets.all(20.0),
+                          filled: true,
+                          fillColor: Styles.surfaceColor,
+                          hintText: 'Department Name',
+                          hintStyle: GoogleFonts.montserrat(fontSize: 16,fontWeight: FontWeight.w300),
+                          enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22),
+                              borderSide: BorderSide(color: Styles.surfaceColor,width: 1)
+                          ),
+                          border:  OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(22),
+                              borderSide: BorderSide(color: Styles.surfaceColor,width: 1)
+                          ),
+                        ),
+                      ),
+                        Gap(15),
                           student?TextField(
-                            controller: sectionController,
+                            controller: rollnoController,
                             keyboardType: TextInputType.name,
                             decoration: InputDecoration(
                               labelStyle: GoogleFonts.montserrat(fontSize: 16,fontWeight: FontWeight.w400),
                               contentPadding: EdgeInsets.all(20.0),
                               filled: true,
                               fillColor: Styles.surfaceColor,
-                              hintText: 'Section',
+                              hintText: 'Rollno',
                               hintStyle: GoogleFonts.montserrat(fontSize: 16,fontWeight: FontWeight.w300),
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(22),
@@ -148,7 +176,7 @@ class _SignUpState extends State<SignUp> {
                                   borderSide: BorderSide(color: Styles.surfaceColor,width: 1)
                               ),
                             ),
-                          ):SizedBox.shrink(),
+                          ) :SizedBox.shrink(),
                         ],
                       ),
                     ),
@@ -231,7 +259,7 @@ class _SignUpState extends State<SignUp> {
                       child: GestureDetector(
                           child: loading?CircularProgressIndicator():SecondryButton(title: 'SignUp',width: size.width,height: size.height*0.07,),
                           onTap:  (){
-                            signUp();
+                            signup();
                           },
                       ),
                     ),
@@ -260,23 +288,62 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  signUp()  {
-    if(validateFields()){
-      if(student){
-        authService.signUpUser(context: context, email: emailController.text, password: passController.text, fullname: fullnameController.text,section: sectionController.text);
-      }else{
-        authService.signUpUser(context: context, email: emailController.text, password: passController.text, fullname: fullnameController.text,section: '');
-
+  // signUp()  {
+  //   if(validateFields()){
+  //     if(student){
+  //       // authService.signUpUser(context: context, email: emailController.text, password: passController.text, fullname: fullnameController.text,section: sectionController.text);
+  //       // Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
+  //     }else{
+  //       // authService.signUpUser(context: context, email: emailController.text, password: passController.text, fullname: fullnameController.text,section: '');
+  //     }
+  //   }else{
+  //
+  //   }
+  //
+  //
+  //
+  // }
+  Future signup() async{
+   if(validateFields())
+     {
+      try{
+        ProgressDialog progressdialog=ProgressDialog(context, title: Text('Please Wait'), message: Text('Signing up...'));
+        progressdialog.show();
+        FirebaseAuth auth= FirebaseAuth.instance;
+        UserCredential userCredential=await auth.createUserWithEmailAndPassword(email: emailController.text.trim(), password: passController.text.trim());
+        FirebaseFirestore firestore=FirebaseFirestore.instance;
+        String uid=userCredential.user!.uid;
+        if(student)
+          {
+            try{
+              firestore.collection('students').doc(uid).set({
+                'name':fullnameController.text.trim(),
+                'rollno':rollnoController.text.trim(),
+                'dept':deptController.text.trim(),
+                'role':"Student"
+              });
+            } catch (e) {
+              print(e);
+            }
+          }
+        else{
+          firestore.collection('faculty').doc(uid).set({
+            'name':fullnameController.text.trim(),
+            'dept':deptController.text.trim(),
+            'role':"Faculty"
+          });
+          progressdialog.dismiss();
+        }
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
+        showMessage("Successfully SignedIn");
+      }on FirebaseAuthException catch (e) {
+        utils.showSnackBar(e.message);
       }
-
-
-    }else{
-
-
-    }
-
-
-
+    //   catch(e)
+    // {
+    //   showMessage("Error occured");
+    // }
+     }
   }
   void showMessage(String s) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -291,10 +358,21 @@ class _SignUpState extends State<SignUp> {
       }else if(emailController.text.isEmpty){
         showMessage("Must Enter Email Address");
         return false;
-      }else if(passController.text.isEmpty){
+      }
+      else if (deptController.text.isEmpty)
+      {
+        showMessage("Must Enter Departmet Name");
+        return false;
+      }
+      else if (passController.text.length <6)
+          {
+            showMessage("Password length must be greater than 6");
+            return false;
+          }
+      else if(passController.text.isEmpty){
         showMessage("Must Enter Password");
         return false;
-      }else if(sectionController.text.isEmpty){
+      }else if(rollnoController.text.isEmpty){
         showMessage("Must Enter Section");
         return false;
       }

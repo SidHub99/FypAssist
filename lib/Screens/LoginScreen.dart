@@ -1,11 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:fyp_assist/Classes/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_assist/Services/AuthService.dart';
 import 'package:fyp_assist/Styles/applayout.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ndialog/ndialog.dart';
 import '../Styles/Styles.dart';
 import '../Widgets/SecondryButton.dart';
+import 'HomeScreen.dart';
 import 'SignUp.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -155,9 +159,27 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   signin() async {
-    if(validateFields()) {
-       authService.signInUser(context: context, email: emailController.text, password: passController.text, );
+    if(validateFields()){
+      ProgressDialog progressdialog=ProgressDialog(context, title: Text('Please wait'), message: Text('Logging In...'));
+      var email=emailController.text.trim();
+      var pass=passController.text.trim();
+      progressdialog.show();
+      try{
+        FirebaseAuth firebaseAuth=FirebaseAuth.instance;
+        UserCredential userCredential=await firebaseAuth.signInWithEmailAndPassword(email: email, password: pass);
+        progressdialog.dismiss();
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+      }on FirebaseAuthException catch (e) {
+        progressdialog.dismiss();
+        utils.showSnackBar(e.message);
+      }
+
+
     }
+    // if(validateFields()) {
+    //    authService.signInUser(context: context, email: emailController.text, password: passController.text, );
+    //
+    // }
   }
   void showMessage(String s) {
     ScaffoldMessenger.of(context).showSnackBar(

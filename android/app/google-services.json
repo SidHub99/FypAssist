@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "931063903362",
+    "project_id": "fypassist-eb712",
+    "storage_bucket": "fypassist-eb712.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:931063903362:android:b46d06d49cf41c4468309b",
+        "android_client_info": {
+          "package_name": "com.saarimtech.fypassist.fyp_assist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "931063903362-891cumismvbh6sv80552ohtv2frvre8i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCb9FfySXJUgGvsilvsK6WiyHHryltkirc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "931063903362-891cumismvbh6sv80552ohtv2frvre8i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
