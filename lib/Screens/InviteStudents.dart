@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_assist/Widgets/StudentContainer.dart';
+import 'package:http/http.dart';
 import '../Widgets/SearchBar.dart';
 import '../Widgets/SupervisorContainer.dart';
 import '../Widgets/TitleNavigation.dart';
@@ -16,17 +17,18 @@ class InviteStudents extends StatefulWidget {
 
 class _InviteStudentsState extends State<InviteStudents> {
   @override
-  CollectionReference? taskref;
-  // Future getDocid() async {
-  //   await FirebaseFirestore.instance.collection('students').get().then(
-  //           (snapshot)=> snapshot.docs.forEach(((element) {
-  //         print (element.reference);
-  //       }))
-  //   );
-  // }
+  String name="";
+  Future getadata() async{
+    var ref= await FirebaseFirestore.instance.collection('students').doc().get();
+    setState(() {
+      name=ref.data()!['name'];
+    });
+}
   void initState(){
+    getadata();
     super.initState();
-    String uid = FirebaseAuth.instance.currentUser!.uid;  }
+
+  }
   Widget build(BuildContext context) {
 
     return Scaffold(
@@ -43,6 +45,7 @@ class _InviteStudentsState extends State<InviteStudents> {
             else{
               return ListView.builder(itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
+                DocumentSnapshot data=snapshot.data!.docs[index];
                 return
                   Column(
                     children: [
@@ -60,7 +63,7 @@ class _InviteStudentsState extends State<InviteStudents> {
                                 padding: EdgeInsets.only(left:22,right: 22,),
                                 child: Column(
                                   children: [
-                                    Padding(padding:EdgeInsets.only(top: 20),child: StudentContainer(interest: 'Flutter',imgAsset: 'assets/supervisor.png',title:snapshot.data!.docs[index]['name'] )),
+                                    Padding(padding:EdgeInsets.only(top: 20),child: StudentContainer(interest: 'Flutter',imgAsset: 'assets/supervisor.png',title:data['name'] )),
 
                                   ],
                                 ),
